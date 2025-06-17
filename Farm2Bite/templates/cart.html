@@ -1,6 +1,23 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+{% if not ci %}
+<div class="container text-center my-5">
+  <img src="{% static 'images/cart-empty.png' %}" alt="Empty Cart" style="width: 150px;">
+  
+  <h2 class="mt-4">
+    Your Cart is <span class="text-danger fw-bold">Empty!</span>
+  </h2>
+  
+  <p class="text-muted mt-2">
+    Must add items on the cart before you proceed to check out.
+  </p>
+  
+  <a href="{% url 'home' %}" class="btn btn-danger btn-lg mt-4 px-4 py-2" style="border-radius: 30px;">
+    🛍️ RETURN TO SHOP
+  </a>
+</div>
+{% else%}
 <div class="body">
 <div class="container cart-container cart-container1">
   <h2 class="cart-title cart-title1">Shopping Cart</h2>
@@ -15,24 +32,26 @@
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td>
-          <img src="https://i.imgur.com/Rw9oI3D.png" class="product-img product-img1 me-2" alt="T-shirt">
-          Summer T-Shirt
+  {% for i in ci %}
+      <tr><td>
+          <a href="{% url 'deleteitem' i.prodt.id %}"><img src="{% static 'images/bin.png'%}" style="width: 20px;"></a>
+          <a href="{{ i.prodt.get_url }}" style="text-decoration: none;"><img src="{{ i.prodt.image.url }}" class="product-img product-img1 me-2" alt="{{ i.prodt.name }}">
+           {{ i.prodt.name }}</a>
         </td>
-        <td>$177.00</td>
-        <td><input type="number" value="1" class="form-control w-50"></td>
-        <td>$177.00</td>
+        <td>₹{{ i.prodt.price }}</td>
+       <td>
+  <div style="border-radius: 12px;   display: inline-flex; align-items: center; justify-content: space-between; border: 2px solid #ddffcc;  padding: 5px 10px; background-color: #f3ffea; width: 100px;">
+    <a href="{% url 'mincart' i.prodt.id %}"  style="color: #000000; font-size: 20px; text-decoration: none; margin-right: 10px;">−</a>
+    <span style="font-weight: bold; font-size: 18px; color: #000;">{{ i.quan }}</span>
+    <a href="{% url 'inccart' i.prodt.id %}" style="color: #131313; font-size: 20px; text-decoration: none; margin-left: 10px;">＋</a>
+  </div>
+</td>
+
+        
+        <td>₹{{ i.total }}</td>
+
       </tr>
-      <tr>
-        <td>
-          <img src="https://i.imgur.com/xZQZ4UT.png" class="product-img me-2" alt="Jacket">
-          Warm Jacket
-        </td>
-        <td>$245.00</td>
-        <td><input type="number" value="1" class="form-control w-50"></td>
-        <td>$245.00</td>
-      </tr>
+        {% endfor %}
     </tbody>
   </table>
 
@@ -43,22 +62,34 @@
         <input type="text" class="form-control" placeholder="Coupon code" id="promo">
         <button class="btn btn-primary" type="button">Apply Coupon</button>
       </div>
+      <br>
+      <div>
+        <a href="{% url 'home' %}"><button class="btn " style="background-color: rgb(243, 15, 26); color:aliceblue;width:150px;">Buy More</button></a>
+      </div>
     </div>
     <div class="col-md-6">
       <table class="table">
         <tr>
-          <th>Subtotal</th>
-          <td>$281.00</td>
+         
+
+          <td></td>
         </tr>
         <tr>
           <th>Total</th>
-          <td><strong>$281.00</strong></td>
+          <td><strong>₹{{t}}</strong></td>
+        </tr>
+        <tr>
+          <th>Tax</th>
+          <td><strong>₹{{tax}}</strong></td>
+        </tr>
+        <tr>
+          <th>Grand Total</th>
+          <td><strong>₹{{grandtotal}}</strong></td>
         </tr>
       </table>
-      <button class="btn btn-success checkout-btn">Proceed to Checkout</button>
-    </div>
+      <a href="{% url 'checkout' %}"><button class="btn btn-success checkout-btn">Proceed to Checkout</button></a>
   </div>
 </div>
 </div>
-
+{% endif %}
 {% endblock%}

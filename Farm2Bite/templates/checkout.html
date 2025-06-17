@@ -1,0 +1,33 @@
+<form method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  <!-- Address Selection -->
+  <h4>Select Delivery Address:</h4>
+  {% for addr in addresses %}
+    <label>
+      <input type="radio" name="selected_address" value="{{ addr.id }}" {% if forloop.first %}checked{% endif %}>
+      {{ addr.full_name }}, {{ addr.house_no }}, {{ addr.area }}, {{ addr.city }} - {{ addr.pincode }}
+    </label><br>
+  {% endfor %}
+  <a href="#">+ Add New Address</a>
+
+  <!-- Payment Method -->
+  <h4 class="mt-3">Choose Payment Method:</h4>
+  <label><input type="radio" name="payment_method" value="COD"> Cash on Delivery</label><br>
+  <label><input type="radio" name="payment_method" value="UPI"> UPI (Upload Payment Screenshot)</label><br>
+
+  <!-- Screenshot Field for UPI -->
+  <div class="mt-2">
+    <label>Upload Screenshot (if UPI):</label>
+    <input type="file" name="payment_screenshot" accept="image/*">
+  </div>
+
+  <!-- Summary -->
+  <h4 class="mt-3">Summary:</h4>
+  <p>Subtotal: ₹{{ cart_total }}</p>
+  <p>Tax (2%): ₹{{ tax }}</p>
+  <p><strong>Total: ₹{{ grand_total }}</strong></p>
+
+  <!-- Submit -->
+  <button type="submit" class="btn btn-success mt-3">Place Order</button>
+</form>
