@@ -1,0 +1,31 @@
+<h3>Total Amount: ₹{{ amount }}</h3>
+<button id="rzp-button">Pay Now</button>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    var options = {
+        "key": "{{ razorpay_key_id }}",
+        "amount": "{{ payment.amount }}", 
+        "currency": "INR",
+        "name": "Farm2Bite",
+        "description": "Order Payment",
+        "order_id": "{{ payment.id }}",
+        "handler": function (response){
+            alert("Payment successful! Payment ID: " + response.razorpay_payment_id);
+            // Optionally redirect to success page
+        },
+        "prefill": {
+            "name": "{{ user.username }}",
+            "email": "{{ user.email }}"
+        },
+        "theme": {
+            "color": "#28a745"
+        }
+    };
+
+    var rzp = new Razorpay(options);
+    document.getElementById('rzp-button').onclick = function(e){
+        rzp.open();
+        e.preventDefault();
+    };
+</script>

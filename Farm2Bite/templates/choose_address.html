@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-5">
+  <h3 class="text-center mb-4">Enter Address Manually</h3>
+  
+  <form id="locationForm" method="POST" action="{% url 'manual_address' %}" class="row g-3 justify-content-center">
+    {% csrf_token %}
+    
+    <div class="col-md-6">
+      <input type="text" class="form-control" name="full_name" placeholder="Full Name" required>
+    </div>
+    <div class="col-md-6">
+      <input type="text" class="form-control" id="house_no" name="house_no" placeholder="House No" required>
+    </div>
+    <div class="col-md-6">
+      <input type="text" class="form-control" id="area" name="area" placeholder="Area" required>
+    </div>
+    <div class="col-md-6">
+      <input type="text" class="form-control" id="city" name="city" placeholder="City" required>
+    </div>
+    <div class="col-md-6">
+      <input type="text" class="form-control" id="state" name="state" placeholder="State" required>
+    </div>
+    <div class="col-md-6">
+      <input type="text" class="form-control" id="pincode" name="pincode" placeholder="Pincode" required>
+    </div>
+    <div class="col-md-6">
+      <input type="text" class="form-control" name="phone" placeholder="Phone" required>
+    </div>
+
+    <div class="col-md-12 text-center mt-3">
+      <button type="submit" class="btn btn-success btn-lg me-2">Submit</button>
+      <button type="button" onclick="getCurrentLocation()" class="btn btn-outline-secondary btn-lg">Use Current Location</button>
+    </div>
+  </form>
+</div>
+
+<script>
+function getCurrentLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(success, error);
+  } else {
+    alert("Geolocation is not supported by your browser.");
+  }
+}
+
+function success(position) {
+  const latitude = position.coords.latitude;
+  const longitude = position.coords.longitude;
+
+  fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`)
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('house_no').value = data.address.house_number || '';
+      document.getElementById('area').value = data.address.suburb || data.address.neighbourhood || '';
+      document.getElementById('city').value = data.address.city || data.address.town || data.address.village || '';
+      document.getElementById('state').value = data.address.state || '';
+      document.getElementById('pincode').value = data.address.postcode || '';
+    })
+    .catch(err => {
+      alert("Failed to get address from location.");
+    });
+}
+
+function error(err) {
+  alert("Unable to retrieve location: " + err.message);
+}
+</script>
+{% endblock %}

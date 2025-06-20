@@ -1,33 +1,57 @@
-<form method="POST" enctype="multipart/form-data">
-  {% csrf_token %}
+{% extends 'base.html' %}
+{% load static %}
 
-  <!-- Address Selection -->
-  <h4>Select Delivery Address:</h4>
-  {% for addr in addresses %}
-    <label>
-      <input type="radio" name="selected_address" value="{{ addr.id }}" {% if forloop.first %}checked{% endif %}>
-      {{ addr.full_name }}, {{ addr.house_no }}, {{ addr.area }}, {{ addr.city }} - {{ addr.pincode }}
-    </label><br>
-  {% endfor %}
-  <a href="#">+ Add New Address</a>
+{% block content %}
+<div class="container my-5">
+  <h2 class="mb-4">Checkout</h2>
 
-  <!-- Payment Method -->
-  <h4 class="mt-3">Choose Payment Method:</h4>
-  <label><input type="radio" name="payment_method" value="COD"> Cash on Delivery</label><br>
-  <label><input type="radio" name="payment_method" value="UPI"> UPI (Upload Payment Screenshot)</label><br>
-
-  <!-- Screenshot Field for UPI -->
-  <div class="mt-2">
-    <label>Upload Screenshot (if UPI):</label>
-    <input type="file" name="payment_screenshot" accept="image/*">
+  <!-- Cart Summary -->
+  <div class="card p-4 mb-4">
+    <h4>Your Order Summary</h4>
+    <ul class="list-group mb-3">
+      {% for item in cart_items %}
+    
+        <li class="list-group-item d-flex justify-content-between align-items-center" style="color: black;">
+          {{ item.prodt.name }} × {{ item.quan }}
+          <span>₹{{ item.prodt.price|floatformat:2 }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+    <p><strong>Subtotal:</strong> ₹{{ total|floatformat:2 }}</p>
+    <p><strong>Tax (2%):</strong> ₹{{ tax|floatformat:2 }}</p>
+    <p class="fw-bold fs-5">Grand Total: ₹{{ grand_total|floatformat:2 }}</p>
   </div>
 
-  <!-- Summary -->
-  <h4 class="mt-3">Summary:</h4>
-  <p>Subtotal: ₹{{ cart_total }}</p>
-  <p>Tax (2%): ₹{{ tax }}</p>
-  <p><strong>Total: ₹{{ grand_total }}</strong></p>
+  <!-- Razorpay Payment or Add Address -->
+  
+    <button id="rzp-button" class="btn btn-success w-100" style="background-color: rgb(103, 255, 141);">Pay Now</button>
 
-  <!-- Submit -->
-  <button type="submit" class="btn btn-success mt-3">Place Order</button>
-</form>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+      var options = {
+        "key": "{{ razorpay_key_id }}",
+        "amount": "{{ payment.amount }}",
+        "currency": "INR",
+        "name": "Farm2Bite",
+        "description": "Order Payment",
+        "order_id": "{{ payment.id }}",
+        "handler": function (response) {
+          window.location.href = "/payment-success/?payment_id=" + response.razorpay_payment_id;
+        },
+        "prefill": {
+          "name": "{{ user.first_name }}",
+          "email": "{{ user.email }}"
+        },
+        "theme": {
+          "color": "#28a745"
+        }
+      };
+      var rzp = new Razorpay(options);
+      document.getElementById('rzp-button').onclick = function (e) {
+        rzp.open();
+        e.preventDefault();
+      };
+    </script>
+ 
+</div>
+{% endblock %}

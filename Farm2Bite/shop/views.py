@@ -3,6 +3,8 @@ from django.shortcuts import render,get_object_or_404
 from .models import Product,Category_list
 from django.urls import reverse
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
+
 def home(request):
     obj=Product.objects.all()
     obj1=Category_list.objects.all()
@@ -15,9 +17,10 @@ def Category_lists(request,c_slug=None):
         product=Product.objects.filter(Category=c_page,availability=True)
         return render(request,'Category_lists.html',{'product':product,'c_page':c_page})
     
-def product_detail(request,c_slug,product_slug):
-        pro=Product.objects.get(Category__slug=c_slug, slug=product_slug)
-        return render(request,'product_details.html',{'pro':pro})
+@login_required
+def product_detail(request, c_slug, product_slug):
+    pro = get_object_or_404(Product, Category__slug=c_slug, slug=product_slug)
+    return render(request, 'product_details.html', {'pro': pro})
 
 def search(request):
     product=None

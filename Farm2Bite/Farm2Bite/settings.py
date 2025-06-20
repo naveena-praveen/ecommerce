@@ -144,3 +144,10 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'farm2bitelogin@gmail.com'
 EMAIL_HOST_PASSWORD = 'mhuqbupmsopenvsn'  
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+# Razorpay 
+RAZORPAY_KEY_ID = 'rzp_test_e75BYbqRMm1Ni7'
+RAZORPAY_KEY_SECRET = 'TN38P3Y4moCzaFbe2pCMbe3A'
+
+LOGIN_URL = '/accounts/login/'

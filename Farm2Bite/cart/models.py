@@ -19,3 +19,12 @@ class Items(models.Model):
     def __str__(self):
         return self.prodt.name
 
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    total_amount = models.FloatField()
+    order_id = models.CharField(max_length=100)
+    paid = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Order {self.order_id} by {self.user.username}"
